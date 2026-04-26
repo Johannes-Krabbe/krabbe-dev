@@ -1,0 +1,26 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Not found — ${SITE_TITLE}`} description="" />
+		<style>
+			main {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			.not-found {
+				color: var(--color-muted);
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<div class="not-found">not found</div>
+		</main>
+	</body>
+</html>

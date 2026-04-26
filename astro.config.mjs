@@ -162,6 +162,9 @@ const vague = {
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://example.com',
+	redirects: {
+		'/posts/[...slug]': '/[...slug]',
+	},
 	integrations: [mdx(), sitemap()],
 	markdown: {
 		shikiConfig: {

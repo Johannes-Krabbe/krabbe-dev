@@ -37,11 +37,10 @@ const isoDate = (d: Date) => d.toISOString().slice(0, 10);
 			a {
 				color: var(--color-heading);
 				text-decoration: none;
-				border-bottom: 1px solid var(--color-border);
-				transition: border-color 0.15s ease;
+				transition: color 0.15s ease;
 			}
 			a:hover {
-				border-bottom-color: var(--color-muted);
+				color: var(--color-muted);
 			}
 			@media (max-width: 640px) {
 				li {
@@ -67,7 +66,7 @@ const isoDate = (d: Date) => d.toISOString().slice(0, 10);
 							<time class="date" datetime={post.data.pubDate.toISOString()}>
 								{isoDate(post.data.pubDate)}
 							</time>
-							<a href={`/blog/${post.id}/`}>{post.data.title}</a>
+							<a href={`/${post.data.slug}/`}>{post.data.title}</a>
 						</li>
 					))
 				}
