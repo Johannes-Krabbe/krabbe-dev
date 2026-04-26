@@ -1,86 +1,167 @@
 ---
-import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
-import Header from '../components/Header.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate } = Astro.props;
 ---
 
 <html lang="en">
 	<head>
 		<BaseHead title={title} description={description} />
 		<style>
-			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
-				margin: 0;
+			.back {
+				display: inline-block;
+				margin-bottom: 2em;
+				color: #999;
+				text-decoration: none;
 			}
-			.hero-image {
-				width: 100%;
-			}
-			.hero-image img {
-				display: block;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
-			}
-			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
-			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
+			.back:hover {
+				color: rgb(var(--black));
 			}
 			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
+				margin-bottom: 1em;
+				color: #999;
 			}
 			.last-updated-on {
 				font-style: italic;
 			}
 		</style>
+		<style is:global>
+			.content h1::before {
+				content: '# ';
+				color: #999;
+			}
+			.content h2::before {
+				content: '## ';
+				color: #999;
+			}
+			.content h3::before {
+				content: '### ';
+				color: #999;
+			}
+			.content h4::before {
+				content: '#### ';
+				color: #999;
+			}
+			.content h5::before {
+				content: '##### ';
+				color: #999;
+			}
+			.content h6::before {
+				content: '###### ';
+				color: #999;
+			}
+			.code-block {
+				position: relative;
+				margin: 1em 0;
+			}
+			.code-block pre {
+				margin: 0;
+				padding-top: 2.5em;
+			}
+			.code-lang {
+				position: absolute;
+				top: 0.7em;
+				left: 1.25em;
+				font-family: var(--font-dm-mono);
+				font-size: 0.75em;
+				color: #606079;
+				text-transform: lowercase;
+				letter-spacing: 0.04em;
+				pointer-events: none;
+			}
+			.code-copy {
+				position: absolute;
+				top: 0.5em;
+				right: 0.6em;
+				background: none;
+				border: none;
+				color: #606079;
+				cursor: pointer;
+				padding: 4px;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 3px;
+				transition: color 0.15s ease;
+			}
+			.code-copy:hover {
+				color: #cdcdcd;
+			}
+			.code-copy.copied {
+				color: #7fa563;
+			}
+			.code-copy svg {
+				width: 16px;
+				height: 16px;
+				display: block;
+			}
+		</style>
 	</head>
 
 	<body>
-		<Header />
 		<main>
+			<a href="/" class="back">← Posts</a>
 			<article>
-				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+				<div class="date">
+					<FormattedDate date={pubDate} />
+					{
+						updatedDate && (
+							<div class="last-updated-on">
+								Last updated on <FormattedDate date={updatedDate} />
+							</div>
+						)
+					}
 				</div>
-				<div class="prose">
-					<div class="title">
-						<div class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
-						<h1>{title}</h1>
-						<hr />
-					</div>
+				<h1>{title}</h1>
+				<div class="content">
 					<slot />
 				</div>
 			</article>
 		</main>
 		<Footer />
+		<script>
+			const COPY_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+			const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+			document.querySelectorAll('.content pre.astro-code').forEach((pre) => {
+				const lang = pre.getAttribute('data-language') || '';
+				const wrapper = document.createElement('div');
+				wrapper.className = 'code-block';
+				pre.parentNode?.insertBefore(wrapper, pre);
+				wrapper.appendChild(pre);
+
+				if (lang) {
+					const label = document.createElement('span');
+					label.className = 'code-lang';
+					label.textContent = lang;
+					wrapper.appendChild(label);
+				}
+
+				const button = document.createElement('button');
+				button.className = 'code-copy';
+				button.type = 'button';
+				button.setAttribute('aria-label', 'Copy code');
+				button.innerHTML = COPY_ICON;
+				wrapper.appendChild(button);
+
+				button.addEventListener('click', async () => {
+					const code = pre.querySelector('code')?.textContent ?? pre.textContent ?? '';
+					try {
+						await navigator.clipboard.writeText(code);
+						button.innerHTML = CHECK_ICON;
+						button.classList.add('copied');
+						setTimeout(() => {
+							button.innerHTML = COPY_ICON;
+							button.classList.remove('copied');
+						}, 1500);
+					} catch {}
+				});
+			});
+		</script>
 	</body>
 </html>
