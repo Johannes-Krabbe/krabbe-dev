@@ -161,7 +161,7 @@ const vague = {
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://example.com',
+	site: 'https://krabbe.dev',
 	redirects: {
 		'/posts/[...slug]': '/[...slug]',
 	},
